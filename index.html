@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Geologic Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --stone:    #2c2416;
+      --earth:    #4a3728;
+      --clay:     #7a5c44;
+      --sand:     #c4a882;
+      --limestone:#e8dcc8;
+      --chalk:    #f5f0e8;
+      --moss:     #5a6b3a;
+      --rust:     #9b4a2a;
+      --amber:    #c07d3a;
+      --slate:    #4a5568;
+      --overdue:  #8b1a1a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--chalk);
+      color: var(--stone);
+      font-family: 'Libre Baskerville', Georgia, serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--stone);
+      padding: 28px 48px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--limestone);
+      letter-spacing: 0.02em;
+    }
+
+    header .subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--sand);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 4px;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sand);
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+    }
+
+    nav button:hover { background: rgba(255,255,255,0.07); color: var(--limestone); }
+
+    nav button.active {
+      background: var(--chalk);
+      color: var(--stone);
+      font-weight: 500;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 36px 24px 60px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--sand);
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--earth);
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ── INPUTS ── */
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.85rem;
+      background: #fff;
+      border: 1.5px solid var(--sand);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--stone);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--clay);
+    }
+
+    input[type="text"].search {
+      min-width: 200px;
+      padding-left: 32px;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a5c44' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 10px center no-repeat;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .btn-primary {
+      background: var(--earth);
+      color: var(--limestone);
+    }
+    .btn-primary:hover { background: var(--stone); }
+
+    .btn-moss {
+      background: var(--moss);
+      color: #fff;
+    }
+    .btn-moss:hover { background: #46553a; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--clay);
+      border: 1.5px solid var(--sand);
+    }
+    .btn-ghost:hover { background: var(--limestone); border-color: var(--clay); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--rust);
+      border: 1.5px solid #d4a8a8;
+      font-size: 0.68rem;
+      padding: 5px 10px;
+    }
+    .btn-danger:hover { background: #fdf0f0; }
+
+    .btn-return {
+      background: var(--amber);
+      color: #fff;
+      font-size: 0.68rem;
+      padding: 5px 10px;
+    }
+    .btn-return:hover { background: #a86a2e; }
+
+    .btn-sm {
+      font-size: 0.68rem;
+      padding: 5px 10px;
+    }
+
+    /* ── CARDS GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid var(--limestone);
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 20px rgba(74,55,40,0.12);
+      border-color: var(--sand);
+      transform: translateY(-2px);
+    }
+
+    .card-type-badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--limestone);
+      color: var(--clay);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--earth);
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 0.78rem;
+      color: var(--clay);
+      line-height: 1.5;
+    }
+
+    .card .card-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1.5px solid var(--limestone);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+
+    thead {
+      background: var(--earth);
+      color: var(--limestone);
+    }
+
+    thead th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--limestone);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--chalk); }
+
+    tbody td {
+      padding: 11px 16px;
+      color: var(--stone);
+      vertical-align: middle;
+    }
+
+    .tag-overdue {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      background: #fde8e8;
+      color: var(--overdue);
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-returned {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      background: #e8f0e8;
+      color: var(--moss);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .tag-active {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      background: #fef3e2;
+      color: var(--amber);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44,36,22,0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--chalk);
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: slideUp 0.22s ease;
+    }
+
+    @keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:none; } }
+
+    .modal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--earth);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--sand);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    /* ── DETAIL PANEL ── */
+    .detail-panel {
+      display: none;
+      background: #fff;
+      border: 1.5px solid var(--limestone);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .detail-panel.open { display: block; animation: fadeIn 0.2s ease; }
+
+    .detail-panel h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--earth);
+      margin-bottom: 4px;
+    }
+
+    .detail-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--clay);
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .detail-section-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--clay);
+      margin: 16px 0 8px;
+    }
+
+    .mineral-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mineral-chip {
+      background: var(--limestone);
+      color: var(--earth);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mineral-chip button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--rust);
+      font-size: 0.8rem;
+      line-height: 1;
+      padding: 0;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--clay);
+    }
+
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.88rem; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--stone);
+      color: var(--limestone);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #toast.show { opacity: 1; transform: none; }
+
+    /* ── LOAN FILTER TABS ── */
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--limestone);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .filter-tabs button {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--clay);
+      transition: all 0.15s;
+    }
+
+    .filter-tabs button.active {
+      background: var(--earth);
+      color: var(--limestone);
+    }
+
+    .prop-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .prop { margin-bottom: 6px; }
+    .prop-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--clay); }
+    .prop-val { font-size: 0.85rem; color: var(--stone); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>⛰ Geologic Collection</h1>
+    <span class="subtitle">Specimen &amp; Loan Database</span>
+  </div>
+  <nav>
+    <button class="active" onclick="switchTab('rocks')">Rocks</button>
+    <button onclick="switchTab('minerals')">Minerals</button>
+    <button onclick="switchTab('borrowers')">Borrowers</button>
+    <button onclick="switchTab('loans')">Loans</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ══════════════════ ROCKS ══════════════════ -->
+  <div id="tab-rocks" class="tab-panel active">
+    <div class="section-header">
+      <h2>Rock Specimens</h2>
+      <div class="controls">
+        <input type="text" class="search" id="rock-search" placeholder="Search rocks…" oninput="loadRocks()"/>
+        <select id="rock-type-filter" onchange="loadRocks()">
+          <option value="">All types</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-add-rock')">+ Add Rock</button>
+      </div>
+    </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="rock-detail">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <h3 id="detail-name"></h3>
+          <div class="detail-meta" id="detail-meta"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closeDetail()">✕ Close</button>
+      </div>
+      <div class="prop-row" id="detail-props"></div>
+      <div class="detail-section-title">Minerals in this rock</div>
+      <div class="mineral-chips" id="detail-minerals"></div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <select id="mineral-add-select" style="min-width:180px;"></select>
+        <button class="btn btn-moss btn-sm" onclick="linkMineral()">+ Link Mineral</button>
+      </div>
+    </div>
+
+    <div class="card-grid" id="rocks-grid"></div>
+  </div>
+
+  <!-- ══════════════════ MINERALS ══════════════════ -->
+  <div id="tab-minerals" class="tab-panel">
+    <div class="section-header">
+      <h2>Minerals</h2>
+      <div class="controls">
+        <input type="text" class="search" id="mineral-search" placeholder="Search minerals…" oninput="loadMinerals()"/>
+        <button class="btn btn-primary" onclick="openModal('modal-add-mineral')">+ Add Mineral</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Chemical Formula</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="minerals-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════ BORROWERS ══════════════════ -->
+  <div id="tab-borrowers" class="tab-panel">
+    <div class="section-header">
+      <h2>Borrowers</h2>
+      <div class="controls">
+        <input type="text" class="search" id="borrower-search" placeholder="Search borrowers…" oninput="loadBorrowers()"/>
+        <button class="btn btn-primary" onclick="openModal('modal-add-borrower')">+ Add Borrower</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Institution</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="borrowers-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════ LOANS ══════════════════ -->
+  <div id="tab-loans" class="tab-panel">
+    <div class="section-header">
+      <h2>Loans</h2>
+      <div class="controls">
+        <div class="filter-tabs">
+          <button class="active" onclick="setLoanFilter('all', this)">All</button>
+          <button onclick="setLoanFilter('false', this)">Active</button>
+          <button onclick="setLoanFilter('true', this)">Returned</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-loan')">+ New Loan</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rock</th>
+            <th>Borrower</th>
+            <th>Loan Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="loans-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- Add Rock -->
+<div class="modal-overlay" id="modal-add-rock">
+  <div class="modal">
+    <h3>Add Rock Specimen</h3>
+    <div class="form-group"><label>Name *</label><input type="text" id="new-rock-name"/></div>
+    <div class="form-group"><label>Rock Type *</label><select id="new-rock-type"></select></div>
+    <div class="form-group"><label>Texture</label><input type="text" id="new-rock-texture" placeholder="e.g. coarse-grained"/></div>
+    <div class="form-group"><label>Color</label><input type="text" id="new-rock-color" placeholder="e.g. grey, black"/></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-rock')">Cancel</button>
+      <button class="btn btn-primary" onclick="addRock()">Add Rock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Mineral -->
+<div class="modal-overlay" id="modal-add-mineral">
+  <div class="modal">
+    <h3>Add Mineral</h3>
+    <div class="form-group"><label>Name *</label><input type="text" id="new-mineral-name"/></div>
+    <div class="form-group"><label>Chemical Formula</label><input type="text" id="new-mineral-formula" placeholder="e.g. SiO₂"/></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-mineral')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMineral()">Add Mineral</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Borrower -->
+<div class="modal-overlay" id="modal-add-borrower">
+  <div class="modal">
+    <h3>Add Borrower</h3>
+    <div class="form-group"><label>Name *</label><input type="text" id="new-borrower-name"/></div>
+    <div class="form-group"><label>Email</label><input type="email" id="new-borrower-email"/></div>
+    <div class="form-group"><label>Institution</label><input type="text" id="new-borrower-institution"/></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-borrower')">Cancel</button>
+      <button class="btn btn-primary" onclick="addBorrower()">Add Borrower</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Loan -->
+<div class="modal-overlay" id="modal-add-loan">
+  <div class="modal">
+    <h3>New Loan</h3>
+    <div class="form-group"><label>Rock *</label><select id="loan-rock-select"></select></div>
+    <div class="form-group"><label>Borrower *</label><select id="loan-borrower-select"></select></div>
+    <div class="form-group"><label>Due Date *</label><input type="date" id="loan-due-date"/></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-loan')">Cancel</button>
+      <button class="btn btn-primary" onclick="addLoan()">Create Loan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let currentRockId = null;
+  let loanFilter = 'all';
+
+  // ── TABS ──
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'rocks') loadRocks();
+    if (name === 'minerals') loadMinerals();
+    if (name === 'borrowers') loadBorrowers();
+    if (name === 'loans') loadLoans();
+  }
+
+  // ── TOAST ──
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── MODAL ──
+  function openModal(id) {
+    if (id === 'modal-add-rock') populateRockTypeDropdowns();
+    if (id === 'modal-add-loan') populateLoanDropdowns();
+    document.getElementById(id).classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  // ── HELPERS ──
+  function fmt(dateStr) {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+  }
+
+  function emptyRow(cols, msg) {
+    return `<tr><td colspan="${cols}" style="text-align:center; padding:32px; color:var(--clay); font-style:italic;">${msg}</td></tr>`;
+  }
+
+  // ══════════════ ROCKS ══════════════
+
+  async function loadRocks() {
+    const q = document.getElementById('rock-search').value;
+    const rt = document.getElementById('rock-type-filter').value;
+    let url = `${API}/rocks?query=${encodeURIComponent(q)}`;
+    if (rt) url += `&rock_type_id=${rt}`;
+
+    const rocks = await fetch(url).then(r => r.json());
+    const grid = document.getElementById('rocks-grid');
+
+    if (!rocks.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="icon">🪨</div><p>No rocks found.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = rocks.map(r => `
+      <div class="card" onclick="openDetail(${r.rock_id})">
+        <div class="card-type-badge">${r.rock_type_name}</div>
+        <h3>${r.name}</h3>
+        <p>
+          ${r.color ? `<strong>Color:</strong> ${r.color}<br>` : ''}
+          ${r.texture ? `<strong>Texture:</strong> ${r.texture}<br>` : ''}
+        </p>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-danger btn-sm" onclick="deleteRock(${r.rock_id})">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function populateRockTypeDropdowns() {
+    const types = await fetch(`${API}/rocktypes`).then(r => r.json());
+    const sel = document.getElementById('new-rock-type');
+    sel.innerHTML = types.map(t => `<option value="${t.rock_type_id}">${t.name}</option>`).join('');
+
+    const filter = document.getElementById('rock-type-filter');
+    filter.innerHTML = '<option value="">All types</option>' +
+      types.map(t => `<option value="${t.rock_type_id}">${t.name}</option>`).join('');
+  }
+
+  async function addRock() {
+    const name = document.getElementById('new-rock-name').value.trim();
+    const rock_type_id = document.getElementById('new-rock-type').value;
+    const texture = document.getElementById('new-rock-texture').value.trim();
+    const color = document.getElementById('new-rock-color').value.trim();
+    if (!name) return toast('Rock name is required.');
+
+    const res = await fetch(`${API}/rocks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, rock_type_id, texture, color })
+    });
+
+    if (res.ok) {
+      closeModal('modal-add-rock');
+      document.getElementById('new-rock-name').value = '';
+      document.getElementById('new-rock-texture').value = '';
+      document.getElementById('new-rock-color').value = '';
+
+      toast('Rock added!');
+      loadRocks();
+    } else {
+      const err = await res.json();
+      toast('Error: ' + err.error);
+    }
+  }
+
+  async function deleteRock(id) {
+    if (!confirm('Delete this rock specimen?')) return;
+    const res = await fetch(`${API}/rocks/${id}`, { method: 'DELETE' });
+    if (res.ok) { toast('Rock deleted.'); loadRocks(); closeDetail(); }
+    else toast('Could not delete rock.');
+  }
+
+  // ── ROCK DETAIL ──
+
+  async function openDetail(id) {
+    currentRockId = id;
+    const data = await fetch(`${API}/rocks/${id}`).then(r => r.json());
+
+    document.getElementById('detail-name').textContent = data.name;
+    document.getElementById('detail-meta').textContent = data.rock_type_name;
+
+    document.getElementById('detail-props').innerHTML = `
+      ${data.color ? `<div class="prop"><div class="prop-label">Color</div><div class="prop-val">${data.color}</div></div>` : ''}
+      ${data.texture ? `<div class="prop"><div class="prop-label">Texture</div><div class="prop-val">${data.texture}</div></div>` : ''}
+    `;
+
+    renderDetailMinerals(data.minerals);
+    await populateMineralAddSelect(data.minerals);
+
+    document.getElementById('rock-detail').classList.add('open');
+    document.getElementById('rock-detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeDetail() {
+    document.getElementById('rock-detail').classList.remove('open');
+    currentRockId = null;
+  }
+
+  function renderDetailMinerals(minerals) {
+    const el = document.getElementById('detail-minerals');
+    if (!minerals.length) {
+      el.innerHTML = '<span style="font-size:0.8rem; color:var(--clay); font-style:italic;">No minerals linked yet.</span>';
+      return;
+    }
+    el.innerHTML = minerals.map(m => `
+      <div class="mineral-chip">
+        ${m.name}${m.chemical_formula ? ` (${m.chemical_formula})` : ''}
+        <button onclick="unlinkMineral(${m.mineral_id})" title="Remove">✕</button>
+      </div>
+    `).join('');
+  }
+
+  async function populateMineralAddSelect(linked) {
+    const all = await fetch(`${API}/minerals`).then(r => r.json());
+    const linkedIds = new Set(linked.map(m => m.mineral_id));
+    const unlinked = all.filter(m => !linkedIds.has(m.mineral_id));
+    const sel = document.getElementById('mineral-add-select');
+    if (!unlinked.length) {
+      sel.innerHTML = '<option value="">All minerals already linked</option>';
+    } else {
+      sel.innerHTML = unlinked.map(m => `<option value="${m.mineral_id}">${m.name}</option>`).join('');
+    }
+  }
+
+  async function linkMineral() {
+    const mineral_id = document.getElementById('mineral-add-select').value;
+    if (!mineral_id || !currentRockId) return;
+    await fetch(`${API}/rocks/${currentRockId}/minerals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mineral_id })
+    });
+    toast('Mineral linked!');
+    openDetail(currentRockId);
+  }
+
+  async function unlinkMineral(mineralId) {
+    await fetch(`${API}/rocks/${currentRockId}/minerals/${mineralId}`, { method: 'DELETE' });
+    toast('Mineral removed.');
+    openDetail(currentRockId);
+  }
+
+  // ══════════════ MINERALS ══════════════
+
+  async function loadMinerals() {
+    const q = document.getElementById('mineral-search').value;
+    let minerals;
+    try {
+      minerals = await fetch(`${API}/minerals?query=${encodeURIComponent(q)}`).then(r => r.json());
+    } catch(e) { toast('Could not load minerals — is the server running?'); return; }
+    const tbody = document.getElementById('minerals-body');
+
+    if (!minerals.length) {
+      tbody.innerHTML = emptyRow(3, 'No minerals found.');
+      return;
+    }
+
+    tbody.innerHTML = minerals.map(m => `
+      <tr>
+        <td><strong>${m.name}</strong></td>
+        <td style="font-family:'DM Mono',monospace; font-size:0.8rem;">${m.chemical_formula || '—'}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteMineral(${m.mineral_id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function addMineral() {
+    const name = document.getElementById('new-mineral-name').value.trim();
+    const chemical_formula = document.getElementById('new-mineral-formula').value.trim();
+    if (!name) return toast('Mineral name is required.');
+
+    const res = await fetch(`${API}/minerals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, chemical_formula })
+    });
+
+    if (res.ok) {
+      closeModal('modal-add-mineral');
+      document.getElementById('new-mineral-name').value = '';
+      document.getElementById('new-mineral-formula').value = '';
+      toast('Mineral added!');
+      loadMinerals();
+    } else {
+      const err = await res.json();
+      toast('Error: ' + err.error);
+    }
+  }
+
+  async function deleteMineral(id) {
+    if (!confirm('Delete this mineral?')) return;
+    const res = await fetch(`${API}/minerals/${id}`, { method: 'DELETE' });
+    if (res.ok) { toast('Mineral deleted.'); loadMinerals(); }
+    else toast('Could not delete mineral.');
+  }
+
+  // ══════════════ BORROWERS ══════════════
+
+  async function loadBorrowers() {
+    const q = document.getElementById('borrower-search').value;
+    let borrowers;
+    try {
+      borrowers = await fetch(`${API}/borrowers?query=${encodeURIComponent(q)}`).then(r => r.json());
+    } catch(e) { toast('Could not load borrowers — is the server running?'); return; }
+    const tbody = document.getElementById('borrowers-body');
+
+    if (!borrowers.length) {
+      tbody.innerHTML = emptyRow(4, 'No borrowers found.');
+      return;
+    }
+
+    tbody.innerHTML = borrowers.map(b => `
+      <tr>
+        <td><strong>${b.name}</strong></td>
+        <td>${b.email || '—'}</td>
+        <td>${b.institution || '—'}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteBorrower(${b.borrower_id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function addBorrower() {
+    const name = document.getElementById('new-borrower-name').value.trim();
+    const email = document.getElementById('new-borrower-email').value.trim();
+    const institution = document.getElementById('new-borrower-institution').value.trim();
+    if (!name) return toast('Borrower name is required.');
+
+    const res = await fetch(`${API}/borrowers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, institution })
+    });
+
+    if (res.ok) {
+      closeModal('modal-add-borrower');
+      document.getElementById('new-borrower-name').value = '';
+      document.getElementById('new-borrower-email').value = '';
+      document.getElementById('new-borrower-institution').value = '';
+      toast('Borrower added!');
+      loadBorrowers();
+    } else {
+      const err = await res.json();
+      toast('Error: ' + err.error);
+    }
+  }
+
+  async function deleteBorrower(id) {
+    if (!confirm('Delete this borrower?')) return;
+    const res = await fetch(`${API}/borrowers/${id}`, { method: 'DELETE' });
+    if (res.ok) { toast('Borrower deleted.'); loadBorrowers(); }
+    else toast('Could not delete borrower.');
+  }
+
+  // ══════════════ LOANS ══════════════
+
+  function setLoanFilter(val, btn) {
+    loanFilter = val;
+    document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadLoans();
+  }
+
+  async function loadLoans() {
+    let url = `${API}/loans`;
+    if (loanFilter !== 'all') url += `?returned=${loanFilter}`;
+    let loans;
+    try {
+      loans = await fetch(url).then(r => r.json());
+    } catch(e) { toast('Could not load loans — is the server running?'); return; }
+    const tbody = document.getElementById('loans-body');
+
+    if (!loans.length) {
+      tbody.innerHTML = emptyRow(6, 'No loans found.');
+      return;
+    }
+
+    tbody.innerHTML = loans.map(l => {
+      let statusBadge;
+      if (l.is_returned) statusBadge = `<span class="tag-returned">Returned</span>`;
+      else if (l.is_overdue) statusBadge = `<span class="tag-overdue">Overdue</span>`;
+      else statusBadge = `<span class="tag-active">Active</span>`;
+
+      return `
+        <tr>
+          <td><strong>${l.rock_name}</strong></td>
+          <td>${l.borrower_name}</td>
+          <td>${fmt(l.loan_date)}</td>
+          <td>${fmt(l.due_date)}</td>
+          <td>${statusBadge}</td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${!l.is_returned ? `<button class="btn btn-return btn-sm" onclick="returnLoan(${l.loan_id})">Mark Returned</button>` : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteLoan(${l.loan_id})">Delete</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function populateLoanDropdowns() {
+    const [rocks, borrowers] = await Promise.all([
+      fetch(`${API}/rocks`).then(r => r.json()),
+      fetch(`${API}/borrowers`).then(r => r.json())
+    ]);
+    document.getElementById('loan-rock-select').innerHTML =
+      rocks.map(r => `<option value="${r.rock_id}">${r.name}</option>`).join('');
+    document.getElementById('loan-borrower-select').innerHTML =
+      borrowers.map(b => `<option value="${b.borrower_id}">${b.name}</option>`).join('');
+  }
+
+  async function addLoan() {
+    const rock_id = document.getElementById('loan-rock-select').value;
+    const borrower_id = document.getElementById('loan-borrower-select').value;
+    const due_date = document.getElementById('loan-due-date').value;
+    if (!due_date) return toast('Due date is required.');
+
+    const res = await fetch(`${API}/loans`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rock_id, borrower_id, due_date })
+    });
+
+    if (res.ok) {
+      closeModal('modal-add-loan');
+      document.getElementById('loan-due-date').value = '';
+      toast('Loan created!');
+      loadLoans();
+    } else {
+      const err = await res.json();
+      toast('Error: ' + err.error);
+    }
+  }
+
+  async function returnLoan(id) {
+    const res = await fetch(`${API}/loans/${id}/return`, { method: 'PUT' });
+    if (res.ok) { toast('Loan marked as returned.'); loadLoans(); }
+    else toast('Could not update loan.');
+  }
+
+  async function deleteLoan(id) {
+    if (!confirm('Delete this loan record?')) return;
+    const res = await fetch(`${API}/loans/${id}`, { method: 'DELETE' });
+    if (res.ok) { toast('Loan deleted.'); loadLoans(); }
+    else toast('Could not delete loan.');
+  }
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', () => {
+    populateRockTypeDropdowns();
+    loadRocks();
+  });
+</script>
+</body>
+</html>
