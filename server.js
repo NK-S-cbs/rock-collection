@@ -205,6 +205,42 @@ app.post('/api/borrowers', async (req, res) => {
   }
 });
 
+// Check if borrower name exist --> change info in database for existing borrower
+app.put('/api/borrowers/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, email, institution } = req.body;
+
+  if (!name) return res.status(400).json({ error: 'Borrower name is required.' });
+
+  try {
+    const result = await pool.query(
+      `UPDATE Borrowers SET name = $1, email = $2, institution = $3
+       WHERE borrower_id = $4
+       RETURNING *`,
+      [name, email || null, institution || null, id]
+    );
+    if (!result.rowCount) return res.status(404).json({ error: 'Borrower not found.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deleting a borrower
+app.delete('/api/borrowers/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'DELETE FROM Borrowers WHERE borrower_id = $1 RETURNING *',
+      [id]
+    );
+    if (!result.rowCount) return res.status(404).json({ error: 'Borrower not found.' });
+    res.json({ message: 'Borrower deleted', success: true, deleted: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 ///// Loans /////
 
 // Getting loans (the return date is not null)
@@ -239,6 +275,27 @@ app.get('/api/loans', async (req, res) => {
   }
 });
 
+// Creating a new loan
+app.post('/api/loans', async (req, res) => {
+  const { rock_id, borrower_id, due_date } = req.body;
+
+  if (!rock_id) return res.status(400).json({ error: 'rock_id is required.' });
+  if (!borrower_id) return res.status(400).json({ error: 'borrower_id is required.' });
+  if (!due_date) return res.status(400).json({ error: 'due_date is required.' });
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Loans (rock_id, borrower_id, loan_date, due_date)
+       VALUES ($1, $2, NOW(), $3)
+       RETURNING *`,
+      [rock_id, borrower_id, due_date]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Returning the loans (updating)
 app.put('/api/loans/:id/return', async (req, res) => {
   const { id } = req.params;
@@ -252,6 +309,21 @@ app.put('/api/loans/:id/return', async (req, res) => {
     );
     if (!result.rowCount) return res.status(404).json({ error: 'Loan not found.' });
     res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deleting a loan from database
+app.delete('/api/loans/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'DELETE FROM Loans WHERE loan_id = $1 RETURNING *',
+      [id]
+    );
+    if (!result.rowCount) return res.status(404).json({ error: 'Loan not found.' });
+    res.json({ message: 'Loan deleted', success: true, deleted: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
