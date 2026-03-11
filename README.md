@@ -1,6 +1,6 @@
 # Geologic Collection
 
-This is a simple Node/Express application with a PostgreSQL backend for managing a geological rock collection.  It exposes a REST API and a basic front-end HTML page that interacts with the API.
+This is a simple Node/Express application with a PostgreSQL backend for managing a geological rock collection. This application allows users to add, edit and store geological objects (minerals and rock data). Users will be able to sort a preexisting collection in the database, including recording rock types, physical properties, and mineral compositions, and link multiple minerals to specific rocks. In addition, users can borrow specific specimens for examination and analysis in an easy-to-use interface.
 
 ## Setup
 
