@@ -43,6 +43,25 @@ app.get('/api/rocks', async (req, res) => {
     JOIN rocktypes ON rocks.rock_type_id = rocktypes.rock_type_id
   `;
 
+  const params = [];
+  const conditions = [];
+
+  if (query) {
+    params.push(`%${query.toLowerCase()}%`);
+    conditions.push(`(LOWER(rocks.name) LIKE $${params.length} OR LOWER(rocktypes.name) LIKE $${params.length})`);
+  }
+
+  if (rock_type_id) {
+    params.push(rock_type_id);
+    conditions.push(`rocks.rock_type_id = $${params.length}`);
+  }
+
+  if (conditions.length > 0) {
+    sql += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  sql += ' ORDER BY rocks.name ASC';
+
   try {
     const result = await pool.query(sql, params);
     res.json(result.rows);
@@ -67,6 +86,15 @@ app.get('/api/rocks/:id', async (req, res) => {
       return res.status(404).json({ error: 'Rock not found.' });
     }
 
+    const minerals = await pool.query(
+      `SELECT minerals.*
+       FROM Minerals
+       JOIN RockMinerals ON minerals.mineral_id = rockminerals.mineral_id
+       WHERE rockminerals.rock_id = $1
+       ORDER BY minerals.name ASC`,
+      [id]
+    );    
+
     res.json({ ...rock.rows[0], minerals: minerals.rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -74,7 +102,46 @@ app.get('/api/rocks/:id', async (req, res) => {
 });
 
 
-// Adding new rock into the database
+// Adding a new rock
+app.post('/api/rocks', async (req, res) => {
+  let { name, rock_type_id, rock_type, texture, color } = req.body;
+
+  if (!name) return res.status(400).json({ error: 'Rock name is required.' });
+
+  try {
+    //looking up rock, if doesnt exist --> create
+    if (!rock_type_id && rock_type) {
+      const typeResult = await pool.query(
+        `SELECT rock_type_id FROM rocktypes WHERE LOWER(name) = LOWER($1)`,
+        [rock_type]
+      );
+      if (typeResult.rows.length) {
+        rock_type_id = typeResult.rows[0].rock_type_id;
+      } else {
+        const insertType = await pool.query(
+          `INSERT INTO rocktypes (name) VALUES ($1) RETURNING rock_type_id`,
+          [rock_type]
+        );
+        rock_type_id = insertType.rows[0].rock_type_id;
+      }
+    }
+
+    if (!rock_type_id) return res.status(400).json({ error: 'Rock type is required.' });
+
+    const result = await pool.query(
+      `INSERT INTO Rocks (name, rock_type_id, texture, color)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [name, rock_type_id, texture || null, color || null]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Updating existing rock
 app.put('/api/rocks/:id', async (req, res) => {
   const { id } = req.params;
   const { name, rock_type_id, texture, color } = req.body;
@@ -122,6 +189,12 @@ app.get('/api/minerals', async (req, res) => {
   let sql = 'SELECT * FROM Minerals';
   const params = [];
 
+  if (query) {
+    params.push(`%${query.toLowerCase()}%`);
+    sql += ` WHERE LOWER(name) LIKE $1 OR LOWER(chemical_formula) LIKE $1`;
+  }
+
+  sql += ' ORDER BY name ASC';  
 
   try {
     const result = await pool.query(sql, params);
@@ -165,8 +238,62 @@ app.delete('/api/minerals/:id', async (req, res) => {
   }
 });
 
+// Getting rock and minerals link database
 
+app.get('/api/rocks/:id/minerals', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT minerals.*
+       FROM Minerals
+       JOIN RockMinerals ON minerals.mineral_id = rockminerals.mineral_id
+       WHERE rockminerals.rock_id = $1
+       ORDER BY minerals.name ASC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+// Linking mineral to a specific rock
+
+app.post('/api/rocks/:id/minerals', async (req, res) => {
+  const { id } = req.params;
+  const { mineral_id } = req.body;
+
+  if (!mineral_id) return res.status(400).json({ error: 'mineral_id is required.' });
+
+  try {
+   // avoiding duplicate if conflicts
+    await pool.query(
+      `INSERT INTO RockMinerals (rock_id, mineral_id)
+       VALUES ($1, $2)
+       ON CONFLICT DO NOTHING`,
+      [id, mineral_id]
+    );
+    res.status(201).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a mineral linked to rock
+
+app.delete('/api/rocks/:id/minerals/:mineralId', async (req, res) => {
+  const { id, mineralId } = req.params;
+  try {
+    const result = await pool.query(
+      'DELETE FROM RockMinerals WHERE rock_id = $1 AND mineral_id = $2 RETURNING *',
+      [id, mineralId]
+    );
+    if (!result.rowCount) return res.status(404).json({ error: 'Link not found.' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 /////// ROCK LOANING SIDE ///////
 
@@ -178,6 +305,13 @@ app.get('/api/borrowers', async (req, res) => {
   let sql = 'SELECT * FROM Borrowers';
   const params = [];
 
+   if (query) {
+    params.push(`%${query.toLowerCase()}%`);
+    sql += ' WHERE LOWER(name) LIKE $1';
+  }
+
+  sql += ' ORDER BY name ASC';
+ 
   try {
     const result = await pool.query(sql, params);
     res.json(result.rows);
